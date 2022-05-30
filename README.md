@@ -1,7 +1,5 @@
 ## Rho - leveraging python to display financial data at your fingertips
 currently a prototype - not being hosted
-a discord bot featuring a variety of financial functions using pycord
-
 
 
 ## Usage
