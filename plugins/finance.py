@@ -11,6 +11,7 @@ import ffn
 import matplotlib
 import matplotlib.pyplot as plt
 import ystockquote
+from dateutil import parser
 
 # Filename adjustments
 current = os.path.dirname(os.path.realpath(__file__))
@@ -19,13 +20,16 @@ sys.path.append(parent)
 
 # Financial Functions - set of commands pertaining to class finance
 class finance(commands.Cog):
-    
+	def __init__(self, bot):
+		self.bot = bot
+		plugin = str(os.path.basename(__file__)).replace('.py','')
+        
 	# Return csv slash command - return a csv file of price data within a time period given a tickerData
 	@slash_command(name='return_csv', guild_ids=[config.server], description="Returns a csv file of price data within a time period given a ticker")
 	async def return_csv(self, ctx, ticker, start, end):
 		# Set start and end dates as given
-		start = dt.datetime.strptime(start, '%Y-%m-%d')
-		end = dt.datetime.strptime(end, '%Y-%m-%d')
+		start = parser.parse(start)
+		end = parser.parse(end)
         
 		# get historical price data from ticker and send it to a csv
 		tickerData = web.DataReader(ticker, 'yahoo', start, end)
@@ -38,11 +42,11 @@ class finance(commands.Cog):
 	# Return a chart using matplotlib
 	@slash_command(name='chart', guild_ids=[config.server], description="returns the chart of given ticker(s) within start and end dates")
 	async def chart(self, ctx, ticker, start, end):
-		# Set start and end variables as datetimes
-		start = dt.datetime.strptime(start, '%Y-%m-%d')
-		end = dt.datetime.strptime(end, '%Y-%m-%d')
-
-		# read given ticker data through pandas_datareader
+		# Set start and end dates as datetimes
+		start = parser.parse(start)
+		end = parser.parse(end)
+         
+        # read given ticker data through pandas_datareader
 		df = web.DataReader(ticker, 'yahoo', start, end)
 
 		# plot adjusted close and save it to temp.png
@@ -72,10 +76,6 @@ class finance(commands.Cog):
 		
 		# respond with real time yahoo finance price using ystockquote
 		await ctx.respond(str(ystockquote.get_price_book(str(ticker))))
-
-	def __init__(self, bot):
-		self.bot = bot
-		plugin = str(os.path.basename(__file__)).replace('.py','')
 
 def setup(bot):
 	bot.add_cog(finance(bot))
