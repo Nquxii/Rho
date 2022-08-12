@@ -1,11 +1,14 @@
 import discord
 from discord.ext import commands
 from discord.commands import slash_command
+
 import sys
 import os
+import datetime as dt
+
 import pandas as pd
 import pandas_datareader as web
-import datetime as dt
+
 import data.config as config
 import ffn
 import matplotlib
@@ -60,20 +63,15 @@ class finance(commands.Cog):
 	# Return relevant statistics using ffn() module
 	@slash_command(name='stats', guild_ids=[config.server], description="returns elaborate statistics of the of given ticker(s) within start and end dates")
 	async def stats(self, ctx, ticker, start, end):
-        # get prices
-		prices = ffn.get(ticker, start=start, end=end)
-
-		# calculate and display stats
-		stats = prices.calc_stats()
-		
-		#stats = stats.display()
-		
-		await ctx.respond(str((stats)))
+        # get prices & calculate stats
+		prices = ffn.get(ticker, start=start, end=end) 
+		stats = ffn.calc_stats(prices).stats 
+        
+		await ctx.respond(stats)
 
     # Obtain the live price of a given ticker
 	@slash_command(name='live', guild_ids=[config.server], description="returns the real time price of a given ticker")
 	async def live(self, ctx, ticker):
-		
 		# respond with real time yahoo finance price using ystockquote
 		await ctx.respond(str(ystockquote.get_price_book(str(ticker))))
 
